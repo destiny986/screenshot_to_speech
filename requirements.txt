@@ -1,0 +1,6 @@
+interception-python
+pywin32
+pynput
+python-dotenv
+requests
+pyrogram
