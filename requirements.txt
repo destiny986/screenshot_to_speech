@@ -1,6 +1,4 @@
-interception-python
-pywin32
+subprocess
 pynput
-python-dotenv
-requests
-pyrogram
+pygetwindow
+pyperclip
