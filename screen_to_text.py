@@ -1,13 +1,14 @@
 import subprocess
 import time
 
-import pygetwindow as gw
 import pyperclip
+import pywinctl as pwc
 from pynput.keyboard import Controller, Key
 
 # Путь к исполняемому файлу и заголовок окна ScreenshotReader
 finereader_path = "C:\Program Files\ABBYY FineReader 16\ScreenshotReader.exe"
 window_title = "ABBYY Screenshot Reader"
+keyboard = Controller()
 
 
 def waitForNewPaste(timeout=None):
@@ -34,7 +35,9 @@ def waitForNewPaste(timeout=None):
 
 
 def capture_screen_with_finereader(
-    finereader_path=finereader_path, window_title=window_title
+    event,
+    finereader_path=finereader_path,
+    window_title=window_title,
 ) -> str:
     """
     Запускает ABBYY Screenshot Reader, делает скриншот и возвращает
@@ -48,45 +51,60 @@ def capture_screen_with_finereader(
         subprocess.Popen([finereader_path])
         print("ABBYY Screenshot Reader запущен...")
 
-        # Нахожу и активирую окно
-        windows = gw.getWindowsWithTitle(
-            window_title
-        )   # возвращает объект окна заголовок которого содержит эту строку
+        # Нахожу pid окна
+        windows = pwc.getWindowsWithTitle(window_title)
         while not windows:
             print(f"Ошибка: Окно '{window_title}' не найдено.")
             time.sleep(0.2)
-            windows = gw.getWindowsWithTitle(window_title)
+            windows = pwc.getWindowsWithTitle(window_title)
             continue
+        print(windows, " - windows")
+
+        # В windows, ForegroundLockTimeout запрещает перехватывать фокус окну
+        # запущеному скриптом.
+        # Либо отключаем полностью в реестре для всех приложений
+        # Либо клавиша АЛЬТ сбрасывает блок
+        keyboard.press(Key.alt)
+        keyboard.release(Key.alt)
+
+        # Активирую (фокус) окно
         window = windows[0]
-        if window.isMinimized:
-            window.restore()
-        window.activate()
+        # window.show(True)
+        # window.restore(True)
+        # window.acceptInput(True)
+        if not window.isActive:
+            window.activate(True)
 
         # Отправляю команду на захват изображения
-        keyboard = Controller()
         with keyboard.pressed(Key.alt):
             keyboard.press(Key.enter)
             keyboard.release(Key.enter)
         print("Команда на захват изображения отправлена.")
 
-        # Жду завершения распознавания (пока пользователь не выберет область
+        # Жду завершения распознавания (пока пользователь выберет область
         # и подтвердит распознавание или таймаут 30 сек)
         print("Ожидание завершения распознавания...")
         waitForNewPaste(30)
 
         # Получаю текст из буфера обмена
         text = pyperclip.paste()
+        event.clear()
+        print("готово - ", text)
 
         return text if text else None
 
     except Exception as e:
         print(f"Произошла ошибка: {e}")
+        event.clear()
         return None
 
 
 if __name__ == "__main__":
+    pass
+    """
     recognized_text = capture_screen_with_finereader()
 
     if recognized_text:
         print("\nРаспознанный текст:")
         print(recognized_text)
+    """
