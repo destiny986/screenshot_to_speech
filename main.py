@@ -1,6 +1,8 @@
 import threading
-from screen_to_text import capture_screen_with_finereader
+
 from pynput import mouse
+
+from screen_to_text import capture_screen_with_finereader
 
 
 def on_click(x, y, button, pressed):
@@ -36,7 +38,6 @@ def screen_to_text_clicks(x, y, button, pressed):
             and event_text_capture_in_process.is_set()
         ):
             event_text_capture_in_process.clear()
-            print("Захват изображения прекращен пользователем")
         elif button == mouse.Button.middle:
             return False
         else:

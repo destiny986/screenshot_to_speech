@@ -5,32 +5,36 @@ import pyperclip
 import pywinctl as pwc
 from pynput.keyboard import Controller, Key
 
+keyboard = Controller()
 # Путь к исполняемому файлу и заголовок окна ScreenshotReader
 finereader_path = "C:\Program Files\ABBYY FineReader 16\ScreenshotReader.exe"
 window_title = "ABBYY Screenshot Reader"
-keyboard = Controller()
+# Позволяет избежать повторных распознаваний и пустого текста
+original_text = "text to avoid double clip recognition"
+timeout = 30  # таймаут времени распознавания для FineReader
 
 
-def waitForNewPaste(timeout=None):
+def waitForNewPaste(
+    event,
+    timeout=None,
+):
     """
     Блокирует исполнение пока строка в буфере не поменяется.
     Код взят из старой версии pyperclip == 1.8.2
     В следующих после этой версии автор вырезал этот функционал потому что
     считает что его не должно быть в core библиотеках.
     """
-    startTime = time.time()
-    originalText = pyperclip.paste()
+    start_time = time.time()
+    pyperclip.copy(original_text)
     while True:
-        currentText = pyperclip.paste()
-        if currentText != originalText:
-            return currentText
+        current_text = pyperclip.paste()
+        if current_text != original_text or not event.is_set():
+            return
         time.sleep(0.01)
 
-        if timeout is not None and time.time() > startTime + timeout:
+        if timeout is not None and time.time() > start_time + timeout:
             raise Exception(
-                "waitForNewPaste() timed out after "
-                + str(timeout)
-                + " seconds."
+                "waitForNewPaste() таймаут после " + str(timeout) + " секунд."
             )
 
 
@@ -58,7 +62,7 @@ def capture_screen_with_finereader(
             time.sleep(0.2)
             windows = pwc.getWindowsWithTitle(window_title)
             continue
-        print(windows, " - windows")
+        print("Окно Screenshot Reader найдено, дескриптор окна ", windows)
 
         # В windows, ForegroundLockTimeout запрещает перехватывать фокус окну
         # запущеному скриптом.
@@ -82,16 +86,18 @@ def capture_screen_with_finereader(
         print("Команда на захват изображения отправлена.")
 
         # Жду завершения распознавания (пока пользователь выберет область
-        # и подтвердит распознавание или таймаут 30 сек)
+        # и подтвердит распознавание или отменит операцию или таймаут 30 сек)
         print("Ожидание завершения распознавания...")
-        waitForNewPaste(30)
+        waitForNewPaste(event, timeout)
 
         # Получаю текст из буфера обмена
         text = pyperclip.paste()
-        event.clear()
-        print("готово - ", text)
-
-        return text if text else None
+        if event.is_set() and text != original_text:
+            event.clear()
+            print("готово: ", text)
+            return text if text else None
+        else:
+            print("Распознование текста прервано.")
 
     except Exception as e:
         print(f"Произошла ошибка: {e}")
@@ -101,10 +107,3 @@ def capture_screen_with_finereader(
 
 if __name__ == "__main__":
     pass
-    """
-    recognized_text = capture_screen_with_finereader()
-
-    if recognized_text:
-        print("\nРаспознанный текст:")
-        print(recognized_text)
-    """
