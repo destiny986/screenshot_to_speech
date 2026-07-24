@@ -4,3 +4,4 @@ pywinctl
 numpy
 yandex_ai_studio_sdk
 sounddevice
+python-dotenv

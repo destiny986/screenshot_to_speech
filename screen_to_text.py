@@ -36,7 +36,7 @@ def waitForNewPaste(
 
         if timeout is not None and time.time() > start_time + timeout:
             raise Exception(
-                "waitForNewPaste() таймаут после " + str(timeout) + " секунд."
+                "waitForNewPaste() timeout after " + str(timeout) + " seconds."
             )
 
 
@@ -56,16 +56,16 @@ def capture_screen_with_finereader(
         # subprocess.Popen() - в основном потоке, но создает дочерний процесс,
         # не блокируя основной поток
         subprocess.Popen([finereader_path])
-        print("ABBYY Screenshot Reader запущен...")
+        print("ABBYY Screenshot Reader loaded")
 
         # Нахожу pid окна
         windows = pwc.getWindowsWithTitle(window_title)
         while not windows:
-            print(f"Ошибка: Окно '{window_title}' не найдено.")
+            print(f"Window '{window_title}' not found yet...")
             time.sleep(0.2)
             windows = pwc.getWindowsWithTitle(window_title)
             continue
-        print("Окно Screenshot Reader найдено, дескриптор окна ", windows)
+        print("Window Screenshot Reader found, descriptor ", windows)
 
         # В windows, ForegroundLockTimeout запрещает перехватывать фокус окну
         # запущеному скриптом.
@@ -86,24 +86,28 @@ def capture_screen_with_finereader(
         with keyboard.pressed(Key.alt):
             keyboard.press(Key.enter)
             keyboard.release(Key.enter)
-        print("Команда на захват изображения отправлена.")
+        print("Image capture started")
 
         # Жду завершения распознавания (пока пользователь выберет область
         # и подтвердит распознавание или отменит операцию или таймаут 30 сек)
-        print("Ожидание завершения распознавания...")
+        print("Waiting for image capture and text recognition...")
         waitForNewPaste(event, timeout)
 
         # Получаю текст из буфера обмена
         text = pyperclip.paste()
         if event.is_set() and text != original_text:
             event.clear()
-            print("готово: ", text)
+            print(
+                "=========== Text to voice ===========\n",
+                text,
+                "\n=====================================",
+            )
             text_to_voice(text, output_device_id)
         else:
-            print("Распознование текста прервано.")
+            print("Image capture or text recognition interrupted")
 
     except Exception as e:
-        print(f"Произошла ошибка: {e}")
+        print(f"Error occured: {e}")
         event.clear()
 
 

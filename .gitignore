@@ -152,3 +152,4 @@ main.onefile-build/
 main.dist/
 *.exe
 *.pk
+*.cmd
