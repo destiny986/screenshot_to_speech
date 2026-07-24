@@ -1,3 +1,6 @@
 pynput
 pyperclip
 pywinctl
+numpy
+yandex_ai_studio_sdk
+sounddevice

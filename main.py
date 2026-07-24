@@ -1,6 +1,7 @@
 import threading
 
 from pynput import mouse
+from yandex_ai_studio_sdk._experimental.audio.utils import choose_audio_device
 
 from screen_to_text import capture_screen_with_finereader
 
@@ -29,7 +30,7 @@ def screen_to_text_clicks(x, y, button, pressed):
             event_text_capture_in_process.set()
             capture_scr_thread = threading.Thread(
                 target=capture_screen_with_finereader,
-                args=(event_text_capture_in_process,),
+                args=(event_text_capture_in_process, output_device_id),
                 daemon=True,
             )
             capture_scr_thread.start()
@@ -48,6 +49,8 @@ def screen_to_text_clicks(x, y, button, pressed):
 
 
 if __name__ == "__main__":
+    # Выбор id девайсов для воспроизведения. Может меняться.
+    output_device_id = choose_audio_device('out')
 
     event_text_capture_in_process = threading.Event()
     # Создание и запуск слушателя в блоке with

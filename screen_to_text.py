@@ -5,6 +5,8 @@ import pyperclip
 import pywinctl as pwc
 from pynput.keyboard import Controller, Key
 
+from ya_speech_kit import text_to_voice
+
 keyboard = Controller()
 # Путь к исполняемому файлу и заголовок окна ScreenshotReader
 finereader_path = "C:\Program Files\ABBYY FineReader 16\ScreenshotReader.exe"
@@ -40,6 +42,7 @@ def waitForNewPaste(
 
 def capture_screen_with_finereader(
     event,
+    output_device_id,
     finereader_path=finereader_path,
     window_title=window_title,
 ) -> str:
@@ -95,14 +98,13 @@ def capture_screen_with_finereader(
         if event.is_set() and text != original_text:
             event.clear()
             print("готово: ", text)
-            return text if text else None
+            text_to_voice(text, output_device_id)
         else:
             print("Распознование текста прервано.")
 
     except Exception as e:
         print(f"Произошла ошибка: {e}")
         event.clear()
-        return None
 
 
 if __name__ == "__main__":
