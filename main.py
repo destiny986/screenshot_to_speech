@@ -44,7 +44,7 @@ def on_click(x, y, button, pressed):
 def screen_to_text_clicks(x, y, button, pressed):
     try:
         if (
-            button == mouse.Button.x1
+            button in (mouse.Button.x1,mouse.Button.x2)
             and not event_text_capture_in_process.is_set()
         ):
             event_text_capture_in_process.set()
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     print(
         "====================================================\n"
         "Screen to Speech loaded\n"
-        "Mouse button x1 - capture image for StS\n"
+        "Mouse button x1 or x2 - capture image for StS\n"
         "Right mouse button - image capture cancellation\n"
         "Middle mouse button - exit program\n"
         "===================================================="

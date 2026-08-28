@@ -95,14 +95,17 @@ def capture_screen_with_finereader(
 
         # Получаю текст из буфера обмена
         text = pyperclip.paste()
-        if event.is_set() and text != original_text:
+        text_fixed = " ".join(text.split())
+
+        if event.is_set() and text_fixed != original_text:
             event.clear()
             print(
-                "=========== Text to voice ===========\n",
-                text,
-                "\n=====================================",
+                "=========== Text to voice ===========",
+                text_fixed,
+                "=====================================",
+                sep="\n"
             )
-            text_to_voice(text, output_device_id)
+            text_to_voice(text_fixed, output_device_id)
         else:
             print("Image capture or text recognition interrupted")
 
