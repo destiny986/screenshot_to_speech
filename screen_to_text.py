@@ -1,6 +1,8 @@
+import os
 import subprocess
 import time
 
+from dotenv import dotenv_values
 import pyperclip
 import pywinctl as pwc
 from pynput.keyboard import Controller, Key
@@ -9,8 +11,11 @@ from ya_speech_kit import text_to_voice
 
 keyboard = Controller()
 # Путь к исполняемому файлу и заголовок окна ScreenshotReader
-finereader_path = "C:\Program Files\ABBYY FineReader 16\ScreenshotReader.exe"
-window_title = "ABBYY Screenshot Reader"
+config = dotenv_values(
+    os.path.join(os.getenv("LOCALAPPDATA"), "ScreenshotToSpeech/.env")
+)
+finereader_path = config["APP_FOLDER"]
+window_title = config["APP_WINDOW_TITLE"]
 # Позволяет избежать повторных распознаваний и пустого текста
 original_text = "text to avoid double clip recognition"
 timeout = 30  # таймаут времени распознавания для FineReader

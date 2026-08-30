@@ -9,14 +9,14 @@
 # nuitka-project: --include-qt-plugins=qml
 #
 # nuitka-project: --windows-icon-from-ico=data/icon.ico
-# nuitka-project: --file-version=1.0
+# nuitka-project: --file-version=1.1
 # nuitka-project: --company-name=KabanTechnologies
 # nuitka-project: --product-name=Screen to Speech
-# nuitka-project: --output-filename=Screen to Speech
+# nuitka-project: --output-filename=Screen to Speech v2
 
 # nuitka-project: --enable-plugin=numpy
 # nuitka-project: --follow-imports
-# nuitka-project: --include-data-dir=data/={MAIN_DIRECTORY}/data
+## nuitka-project: --include-data-dir=data/={MAIN_DIRECTORY}/data
 
 import threading
 
