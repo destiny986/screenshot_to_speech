@@ -7,7 +7,7 @@
 ```
 %LOCALAPPDATA%/ScreenshotToSpeech/.env
 ```
-В форме
+В формате
 ```
 YC_API_KEY = "key"
 YC_FOLDER_ID = "id"
